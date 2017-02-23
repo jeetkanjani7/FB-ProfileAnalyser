@@ -22,19 +22,9 @@ def get_ReactionsCount(reacts):
 def update_reactions(reacts):
 	
 
-	#picture_count+=1
+	
 	rno = get_ReactionsCount(reacts)
 	
-	
-	#if(rno[0]>max_likes):
-	#	max_likes=picture_count
-	#if(rno[1]>max_loves):
-	#	max_loves=picture_count
-	#if(rno[3]>max_wow):
-	#	max_wow=picture_count
-	#print("likes: "+ str(rno[0])+ "loves: "+ str(rno[1])+ "Haha: "+ str(rno[2])+ "WOW: "+ str(rno[3])+ "Sad: "+ str(rno[4])+ "Angry: "+ str(rno[5]))
-	#print("\ncomments: "+str(comno))
-	#print(reacts['summary'])
 	return rno
 
 
@@ -89,7 +79,7 @@ def insert_into_db(profilepic):
 	max_wows=c.execute("select MAX(wows) as max_wows,caption,cdate from pictures")
 	for r4 in max_wows:
 		print("\n------------------------------------------------------------------------------------------------------------------------------------")
-		print(" Most wowed picture: "+str(r4[1])+"\n date= "+str(r4[2])+"\n wowed= "+str(r4[0]))	
+		print(" Most wowed picture: "+str(r4[1])+"\n date= "+str(r4[2])+"\n wows= "+str(r4[0]))	
 		print("------------------------------------------------------------------------------------------------------------------------------------")
 
 def perform_analysis(username, albums):
@@ -117,13 +107,17 @@ def perform_analysis(username, albums):
 
 if __name__ == '__main__':
 
+	with open('details.txt', 'r') as f:
+		ACCESS_TOKEN=f.readline()
+		U_ID=f.readline()
+
+    
+	graph = facebook.GraphAPI(ACCESS_TOKEN, version='2.8')
+	user=graph.get_object(id=U_ID)
+	albums=graph.get_object(id=U_ID+'/albums', field='name')
 	
 
-	graph=facebook.GraphAPI(access_token="EAACEdEose0cBAAz3DrmdzO8lV6OlrXnZCwXYNWRljx7LNyDtwIYfCyhUh2kE8QOqz2FSqu9WMgmdlSnCDRj59zynF70tNuLnk5Dki9H5kQtmj19YubZChiIx12EH37kZCwX2MWK5jQdxpvcj6pyffcZAZAZB1M1bPBbwtcBNXZCfZCKZB9nHOpdJeULDt3MNyijIZD", version=2.8)
-	albums=graph.get_object(id='me/albums', field='name')
-	me=graph.get_object(id='me')
-
-	db_name = str(me['name'] + '_' + "profile")
+	db_name = str(user['name'] + '_' + "profile")
 	conn = sqlite3.connect(db_name[:-1])
 	c = conn.cursor()
 	c.execute("DROP TABLE IF EXISTS pictures")
@@ -137,7 +131,7 @@ if __name__ == '__main__':
 	  cdate TEXT)
 	''')
 	
-	perform_analysis(me['name'],albums) 
+	perform_analysis(user['name'],albums) 
 
 
 
